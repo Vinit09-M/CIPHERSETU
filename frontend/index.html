@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f8f7">
+  <title>CipherSetu — Cryptography posture</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/remediation.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="/" aria-label="CipherSetu home">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span class="brand-name">cipher<span>setu</span></span>
+      </a>
+      <div class="workspace-label">WORKSPACE</div>
+      <nav class="side-nav" aria-label="Main navigation">
+        <a class="nav-item active" href="#overview"><span class="nav-icon">▦</span>Overview</a>
+        <a class="nav-item" href="#new-scan"><span class="nav-icon">⌕</span>Repository scan</a>
+        <a class="nav-item" href="#results"><span class="nav-icon">◈</span>Findings</a>
+        <a class="nav-item" href="#history"><span class="nav-icon">↻</span>Scan history</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="help-card">
+          <span class="help-icon">?</span>
+          <div><strong>New to crypto readiness?</strong><p>Start with a repository scan to see what your code uses.</p></div>
+        </div>
+        <div class="sidebar-meta"><span class="status-dot"></span>Local workspace <span class="version">ALPHA 0.2</span></div>
+      </div>
+    </aside>
+
+    <main class="main-area" id="overview">
+      <header class="topbar">
+        <div class="breadcrumbs">Workspace <span>/</span> <strong>Overview</strong></div>
+        <div class="topbar-right"><span class="secure-label"><span class="status-dot"></span>Private, local scans</span><span class="avatar">CS</span></div>
+      </header>
+
+      <div class="content-wrap">
+        <section class="welcome-row">
+          <div><div class="eyebrow">CRYPTOGRAPHIC READINESS</div><h1>Good morning. <span>Let’s get your code ready.</span></h1><p class="welcome-copy">Map cryptography across your repositories and understand what needs a closer look.</p></div>
+          <a class="text-link" href="#new-scan">How scanning works <span>↗</span></a>
+        </section>
+
+        <section class="metric-grid" aria-label="Workspace summary">
+          <article class="metric-card"><div class="metric-top"><span class="metric-label">Repositories scanned</span><span class="metric-icon mint">⌘</span></div><strong id="metric-scans">—</strong><div class="metric-note">Assessments in this workspace</div></article>
+          <article class="metric-card"><div class="metric-top"><span class="metric-label">Cryptographic findings</span><span class="metric-icon blue">◈</span></div><strong id="metric-findings">—</strong><div class="metric-note">Across your latest assessment</div></article>
+          <article class="metric-card"><div class="metric-top"><span class="metric-label">High priority</span><span class="metric-icon amber">↑</span></div><strong id="metric-high">—</strong><div class="metric-note">Candidates for human review</div></article>
+          <article class="metric-card"><div class="metric-top"><span class="metric-label">Text files inspected</span><span class="metric-icon violet">▤</span></div><strong id="metric-files">—</strong><div class="metric-note">In the latest assessment</div></article>
+        </section>
+
+        <div class="dashboard-grid">
+          <section class="panel scan-panel" id="new-scan">
+            <div class="panel-heading"><div><div class="eyebrow">GET STARTED</div><h2>Scan a repository</h2><p>Choose a source. We’ll identify cryptographic patterns and explain what they mean.</p></div><span class="step-badge">01 <i>/ 01</i></span></div>
+            <div class="source-tabs" role="tablist" aria-label="Repository source"><button class="source-tab active" type="button" data-tab="github" role="tab" aria-selected="true"><span>⌘</span> GitHub</button><button class="source-tab" type="button" data-tab="upload" role="tab" aria-selected="false"><span>⇧</span> Upload ZIP</button></div>
+            <div class="scan-form" id="github-form">
+              <label for="repo">Repository URL or owner/name</label><input id="repo" type="text" placeholder="e.g. acme/payments-api" autocomplete="url">
+              <div class="field-row"><div><label for="ref">Branch, tag or commit</label><input id="ref" type="text" value="HEAD"></div><div><label for="years">Data confidentiality lifetime</label><div class="input-suffix"><input id="years" type="number" min="0" max="100" value="0"><span>years</span></div></div></div>
+              <details class="advanced"><summary>Advanced options <span>Optional</span></summary><div class="advanced-content"><label for="token">Read-only GitHub token</label><input id="token" type="password" autocomplete="off" placeholder="Only needed for private repositories"><p>Used for this request only. The token is cleared after the scan.</p></div></details>
+              <div class="remediation-setting">
+                <label><input id="auto-remediation" type="checkbox" aria-describedby="repository-settings-status" disabled> Automatically track findings in GitHub Issues</label>
+                <small id="repository-settings-status" role="status">Enter a repository to manage its setting.</small>
+              </div>
+              <button class="primary-button" id="github" type="button">Start repository scan <span>→</span></button>
+              <button class="secondary-button preview-scan" id="preview-scan" type="button">Scan and preview only</button>
+            </div>
+            <div class="scan-form upload-form" id="upload-form" hidden>
+              <label for="zip">Repository archive</label><label class="drop-zone" for="zip"><span class="upload-icon">⇧</span><strong id="file-name">Choose a ZIP file</strong><small>Drop it here or browse · Max 10 MiB</small><input id="zip" type="file" accept=".zip,application/zip"></label>
+              <p class="upload-note">Your archive is analyzed locally by this service and is not retained as a source file.</p>
+              <button class="primary-button" id="upload" type="button">Scan uploaded repository <span>→</span></button>
+            </div>
+            <div class="scan-footer"><button id="demo" class="demo-button" type="button"><span>▷</span> Try a sample scan</button><span>Usually takes under a minute</span></div>
+          </section>
+
+          <aside class="panel guide-panel">
+            <div class="eyebrow">YOUR READINESS JOURNEY</div><h2>Clarity before change.</h2><p class="guide-intro">A thoughtful first step toward cryptographic agility.</p>
+            <div class="journey-list"><div class="journey-item"><span class="journey-number done">1</span><div><strong>Discover</strong><p>Find cryptographic identifiers in source files.</p></div></div><div class="journey-line"></div><div class="journey-item"><span class="journey-number">2</span><div><strong>Understand</strong><p>Review evidence, context and confidence.</p></div></div><div class="journey-line"></div><div class="journey-item"><span class="journey-number">3</span><div><strong>Plan</strong><p>Prioritize a migration path with your team.</p></div></div></div>
+            <div class="guide-note"><span>i</span><p>Scores are review priorities, not proof of exploitability. A name match always needs human context.</p></div>
+          </aside>
+        </div>
+
+        <section class="panel results-panel" id="results" hidden>
+          <div class="panel-heading results-heading"><div><div class="eyebrow">ASSESSMENT REPORT</div><h2>Findings <span class="result-tag" id="result-tag">Latest scan</span></h2><p id="coverage">Run a scan to see an assessment.</p></div><button class="secondary-button" id="export" type="button">↓ <span>Export report</span></button></div>
+          <section class="remediation-panel" id="remediation-panel" aria-labelledby="remediation-heading" hidden>
+            <h3 id="remediation-heading">Remediation review</h3>
+            <p id="remediation-status"></p>
+            <p id="remediation-issue-status" hidden></p>
+            <a class="text-link" id="remediation-link" hidden>Open GitHub issue</a>
+            <div id="remediation-validation"></div>
+            <details id="remediation-preview" hidden>
+              <summary>Preview patch</summary>
+              <pre><code id="remediation-diff"></code></pre>
+            </details>
+            <details id="remediation-review-section">
+              <summary id="remediation-review-title">Needs review</summary>
+              <ul id="remediation-review"></ul>
+            </details>
+          </section>
+          <div class="severity-grid" id="counts"></div>
+          <div id="findings" class="findings-list"></div>
+        </section>
+
+        <section class="panel history-panel" id="history">
+          <div class="panel-heading history-heading"><div><div class="eyebrow">YOUR ACTIVITY</div><h2>Recent scans</h2><p>Your last repository assessments in this workspace.</p></div><a class="text-link" href="#history">View all <span>→</span></a></div>
+          <div id="history-list" class="history-list"><div class="empty-state"><span>◷</span><div><strong>No scans yet</strong><p>Your completed repository scans will appear here.</p></div></div></div>
+        </section>
+        <footer class="page-footer"><span>© CipherSetu · Research alpha 0.2</span><span>Heuristic analysis · Human review required</span></footer>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="status" role="status" aria-live="polite"></div>
+  <script src="/static/remediation.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>

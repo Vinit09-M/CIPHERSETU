@@ -1,0 +1,6 @@
+/bin/
+/demo-output*/
+/ci-demo/
+*.aegis
+*-keys/
+.ciphersetu-*
