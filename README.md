@@ -1,37 +1,31 @@
 # CipherSetu
 
-**Find cryptography in source code, prioritize what needs review, and give developers a concrete migration starting point.**
+**Find the cryptography in your codebase. Decide what to migrate first.**
 
-![Research alpha](https://img.shields.io/badge/status-research%20alpha-157861)
-![Python 3.12](https://img.shields.io/badge/Python-3.12-2F5D7B)
-![Go 1.27](https://img.shields.io/badge/Go-1.27-16798A)
-![Local-first](https://img.shields.io/badge/runtime-localhost-333B40)
+An RSA reference in a payments service could be the public key that protects a customer’s data key, a signature check that authenticates a request, or a comment in an old example. Each calls for a different decision. CipherSetu gives application security teams and developers a shared starting point for post-quantum migration: the file, the line, the likely use, and a concrete next step.
 
-[Quick start](#quick-start) · [GitHub Issues](#optional-github-issue-tracking) · [Migration demo](#try-the-migration-demo) · [Development](#development)
+**Research alpha** · Local dashboard · GitHub and ZIP scans · Optional GitHub Issues
 
-## What CipherSetu does
+[Run the sample](#run-the-sample) · [Scan your repository](#scan-your-repository) · [Try a migration](#try-a-migration) · [Set up issue tracking](#set-up-issue-tracking)
 
-| Discover | Prioritize | Hand off |
-| --- | --- | --- |
-| Scan a GitHub commit, repository ZIP, or built-in demo for cryptographic identifiers. | Inspect file and line references, triage scores, likely use, and suggested next steps. | Export a JSON report or open a GitHub issue with all findings for a developer to review. |
+## Run the sample
 
-The Go CLI demonstrates authenticated migration for CipherSetu envelopes. An optional patch preview validates one synthetic RSA-OAEP wrapping pattern. The proposed writer uses **ML-KEM-768 + X25519** for new records, while the dual reader continues to open legacy records.
+With Git and Docker Compose installed, run this from a terminal.
 
-## Quick start
-
-### Docker
-
-~~~bash
+~~~sh
 git clone https://github.com/Vinit09-M/CIPHERSETU.git
 cd CIPHERSETU
 docker compose up --build
 ~~~
 
-Open [http://127.0.0.1:8000](http://127.0.0.1:8000) and select **Try a sample scan**. The Docker image includes scanning, patch planning, and report export. Patch validation in Docker requires a trusted Linux CipherSetu CLI mounted into the container with CIPHERSETU_CLI set to its in-container path.
+Open [the local dashboard](http://127.0.0.1:8000) and select **Try a sample scan**. You can explore the findings and export a JSON report before connecting a repository or configuring credentials.
 
-### Python 3.12
+<details>
+<summary><strong>Run locally with Python instead</strong></summary>
 
-From the cloned repository on Windows:
+From the cloned repository, use Python 3.12 to install the dependencies and start FastAPI.
+
+**Windows PowerShell**
 
 ~~~powershell
 py -3.12 -m venv .venv
@@ -39,63 +33,72 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ~~~
 
-On macOS or Linux:
+**macOS or Linux**
 
-~~~bash
+~~~sh
 python3.12 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 .venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ~~~
 
-### Your first repository scan
+Open [the dashboard](http://127.0.0.1:8000) or explore the [local API documentation](http://127.0.0.1:8000/docs).
 
-1. Enter a GitHub URL or owner/repository and a branch, simple tag, or commit SHA. The default is HEAD. For a private preview, use the optional read-only Contents token.
-2. Choose **Scan and preview only** to keep the result local. Alternatively, upload a repository ZIP up to 10 MiB.
-3. Review the findings and coverage, then download the JSON report or reopen the scan from history. Where a supported rule matches, **Preview patch** shows the proposed code and validation results.
+</details>
 
-## Optional GitHub issue tracking
+## Scan your repository
 
-Issue tracking is off by default. To enable it on a repository you administer:
+1. Enter a GitHub URL or `owner/repository`. Select a branch, simple tag, or commit SHA, or leave the ref at `HEAD`. For a private preview, supply a token with read-only Contents access. You can also upload a repository ZIP up to 10 MiB.
+2. Select **Scan and preview only**. Open a finding and inspect the surrounding code. Severity helps prioritize review. An import or a public key alone cannot establish how an application uses it.
+3. Export the JSON report for review, or enable issue tracking to put the findings in the developers’ queue. If the supported migration rule matches, **Preview patch** shows the proposed change and its validation status.
 
-1. [Register and install a GitHub App](https://docs.github.com/en/apps/creating-github-apps/writing-code-for-a-github-app/quickstart). Give it **Contents: Read-only** and **Issues: Read and write**. Limit the installation to the intended repository and enable GitHub Issues there.
-2. Download the App's PEM private key. Store it outside all Git checkouts. Set CIPHERSETU_GITHUB_APP_ID and CIPHERSETU_GITHUB_APP_KEY_FILE before starting the server. CipherSetu obtains a short-lived installation token scoped to the scanned repository.
-3. Enable **Automatically track findings in GitHub Issues** in the dashboard and choose **Start repository scan**. Each tracked GitHub scan with findings creates a new issue, including repeat scans of the same commit.
+| What you find | What to check next |
+| --- | --- |
+| RSA wrapping a data key | Confirm which writer produces the record and which readers must remain compatible. |
+| RSA used for signatures, tokens, certificates, or TLS | Identify the signing or protocol owner and review compatibility with its consumers. |
+| A public key, import, or documentation reference | Trace the reference to an active call site before proposing a change. |
 
-Issues list every finding with its file and line, criticality, impact, and suggested remediation. Large reports continue in comments on the same issue. Developers assign ownership and submit code changes through their usual review process.
+## Try a migration
 
-## Try the migration demo
+The included demo answers a practical rollout question: **can we change how new records are protected and still read records written before the change?** With the [Go version specified by the module](migration/go.mod), run this from the repository root.
 
-Use the [Go toolchain required by the module](migration/go.mod) and synthetic data:
-
-~~~bash
+~~~sh
 go -C migration run ./cmd/ciphersetu demo --dir demo-output
 ~~~
 
-The demo creates a new legacy envelope and matching temporary keys, rewraps its data key, checks recovered plaintext against the original, and rejects a tampered copy. The original file remains available to the legacy key. Previously obtained legacy copies retain their original exposure.
+The CLI generates synthetic data and fresh keys, rewraps a data key, verifies the recovered data, and checks that a tampered record is rejected. Keep the generated keys outside version control.
 
-For dashboard patch validation, build the CLI and set CIPHERSETU_CLI to the executable path before starting the Python server. For example, in PowerShell:
+The dashboard’s patch preview covers a specific RSA-OAEP data-key wrapper in the Testing-Crypto fixture, `apps/payments/wrap_key.py`. Its proposed writer uses **ML-KEM-768 + X25519** for new records. Its reader can open both formats with their matching keys. Validation generates fresh legacy records so it can exercise both read paths.
+
+For dashboard validation on Windows, build the CLI from the repository root, then start the Python server **in the same shell**.
 
 ~~~powershell
 $env:CIPHERSETU_CLI = Join-Path $env:TEMP 'ciphersetu-validation.exe'
 go -C migration build -buildvcs=false -o "$env:CIPHERSETU_CLI" ./cmd/ciphersetu
 ~~~
 
-The rule recognizes the exact synthetic wrapper at apps/payments/wrap_key.py. It validates hybrid writes, reads of fresh legacy and hybrid records, and tamper rejection. Use fresh synthetic fixtures for migration tests. Previously archived files require their original matching keys and compatible readers.
+For Docker validation, mount a trusted Linux build of the CLI into the container and set `CIPHERSETU_CLI` to its path inside the container. The standard Compose setup supports scanning, patch planning, and report export.
 
-See the [CLI guide](migration/USAGE.md), [envelope format](migration/docs/FORMAT.md), and [migration security notes](migration/SECURITY.md).
+[CLI guide](migration/USAGE.md) · [Envelope format](migration/docs/FORMAT.md) · [Migration security notes](migration/SECURITY.md)
 
-## Scope and interpretation
+## Set up issue tracking
 
-- **Research alpha for one local user.** Run on localhost with synthetic or authorized input. Start with a non-production repository.
-- **Triage scores describe review priority.** An identifier match can be an import, a policy entry, a public key reference, or active code. The scanner evaluates text and excludes runtime use, dependency graphs, and Git history from its coverage.
-- **The migration CLI supports CipherSetu envelopes.** It requires matching keys. Its research key files are unencrypted and belong outside source control.
-- **Reports can contain paths and line numbers.** SQLite stores reports under data/scans.db by default. Repository source and keys stay out of the reports.
+Tracking is **off by default**. Enable it when a team is ready to receive findings in its repository.
 
-## Development
+1. [Register a GitHub App](https://docs.github.com/en/apps/creating-github-apps/writing-code-for-a-github-app/quickstart) with **Contents — Read-only** and **Issues — Read and write**. Install it on the selected repository and enable Issues there.
+2. Store the App’s PEM private key outside all checkouts. Before starting the server, set `CIPHERSETU_GITHUB_APP_ID` and `CIPHERSETU_GITHUB_APP_KEY_FILE` in its environment. The second value is the path to the PEM file. The app obtains a short-lived installation token for the selected repository.
+3. In the dashboard, enable **Automatically track findings in GitHub Issues** and select **Start repository scan**.
 
-~~~bash
+Each tracked scan with findings opens a fresh issue, even for a previously scanned commit. The issue lists every finding with its path and line, criticality, impact, and suggested remediation. Large reports continue in comments on the same issue. The repository owner reviews the advice and approves changes through the team’s usual process.
+
+## Scope and development
+
+CipherSetu is a single-user, localhost research tool. Scan authorized code. Its text scanner covers the selected snapshot. Runtime behavior, dependency graphs, and Git history require separate review. Reports can contain repository paths and line numbers and are stored in `data/scans.db` by default. The migration CLI handles CipherSetu envelopes and requires matching keys. Its research key files are unencrypted.
+
+To run the tests, activate the Python environment above and install the Go toolchain.
+
+~~~sh
 python -m pytest -q
 go -C migration test ./...
 ~~~
 
-The Python suite builds a temporary Go CLI, exercises the synthetic writer and reader, and mocks GitHub API calls. [API reference](http://127.0.0.1:8000/docs) · [Go CLI license](migration/LICENSE)
+The Python tests exercise the synthetic writer and reader with a temporary CLI and mock GitHub publication. The [Go CLI license](migration/LICENSE) applies to the migration module.
